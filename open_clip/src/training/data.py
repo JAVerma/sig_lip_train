@@ -76,36 +76,17 @@ class HfDataset(Dataset):
         ds = datasets.load_dataset(hf_dataset_id)
         self.images = ds[split][img_key]
         self.captions = ds[split][caption_key]
-        # for i in tqdm(range(len(self.images))):
-        #     if self.captions[i] == "A photo of normal lung":
-        #         self.captions[i] = "A photo of pneumonia"
-        #     elif self.captions[i] == "A photo of pneumonia":
-        #         self.captions[i] = "A photo of normal lung"
-        self.images_new = []
-        self.captions_new = []
-        if split == "train":
-            source_names = ds[split]["data_source_name"]
-            gts = pd.read_csv("/home/ubuntu/shubhamk/BioMedCLIP/stage_2_train_labels.csv")
-            ids = ds[split]["id"]
-            for i in tqdm(range(len(self.images))):
-                if "rsna" in source_names[i].lower():
-                    if (gts.loc[gts['patientId'] == ids[i].replace(".jpeg", ""),"Target"] == 0).to_list()[0]:
-                        self.captions[i] = "A photo of normal lung" # , " + self.captions[i]
-                    else:
-                        self.captions[i] = "A photo of pneumonia" # , " + self.captions[i]
-                    self.images_new.append(self.images[i])
-                    self.captions_new.append(self.captions[i])
         self.transforms = transforms
         logging.debug("Done loading data.")
-        
+
         self.tokenize = tokenizer
 
     def __len__(self):
-        return len(self.captions_new)
+        return len(self.captions)
 
     def __getitem__(self, idx):
-        images = self.transforms(self.images_new[idx])
-        texts = self.tokenize(self.captions_new[idx])[0]
+        images = self.transforms(self.images[idx])
+        texts = self.tokenize(self.captions[idx])[0]
         return images, texts
 
 
