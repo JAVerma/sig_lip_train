@@ -26,5 +26,6 @@ TORCH_CUDNN_V8_API_ENABLED=1 torchrun --nproc_per_node 1 -m training.main \
     --name 'DFN-ImageFailLatest2' \
     --report-to "wandb" \
     --wandb-project-name "DFN-finetune-chest" \
-    --use-last4
+    --vision_encoder 4 \
+    --text_encoder 4
     # --val-data 'jiviai/xray_caption_conv' \

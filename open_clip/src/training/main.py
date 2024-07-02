@@ -268,12 +268,26 @@ def main(args):
         **model_kwargs,
     )
 
-    if args.use_last4:
-        for layer in model.parameters():
-            layer.requires_grad = False
-        for layer in model.visual.transformer.resblocks[-3:]:
+    for layer in model.parameters():
+        layer.requires_grad = False
+    if args.vision_encoder >0:
+        layers=int(args.vision_encoder)*-1
+        if args.vision_encoder:
+            for layer in model.visual.trunk.blocks[layers:]:
+                layer.requires_grad_(True)
+            model.visual.trunk.norm.requires_grad_(True)
+            model.visual.trunk.attn_pool.requires_grad_(True)
+            model.visual.trunk.fc_norm.requires_grad_(True)
+            model.visual.trunk.head_drop.requires_grad_(True)
+            model.visual.trunk.head.requires_grad_(True)
+            model.visual.head.requires_grad_(True)
+    if args.text_encoder:
+        layers=int(args.text_encoder)*-1
+        for layer in model.text.transformer.resblocks[layers:]:
             layer.requires_grad_(True)
-        model.visual.ln_post.requires_grad_(True)
+        model.text.ln_final.requires_grad_(True)
+        model.text.text_projection.requires_grad_(True)
+        
         # for layer in model.text.transformer.encoder.layer[-4:]:
         #     layer.requires_grad_(True)
         # for layer in model.text.proj:
