@@ -78,15 +78,15 @@ class HfDataset(Dataset):
         self.captions = ds[split][caption_key]
         self.transforms = transforms
         logging.debug("Done loading data.")
-        
+
         self.tokenize = tokenizer
 
     def __len__(self):
-        return len(self.captions_new)
+        return len(self.captions)
 
     def __getitem__(self, idx):
-        images = self.transforms(self.images_new[idx])
-        texts = self.tokenize(self.captions_new[idx])[0]
+        images = self.transforms(self.images[idx])
+        texts = self.tokenize(self.captions[idx])[0]
         return images, texts
 
 
