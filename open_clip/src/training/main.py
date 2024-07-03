@@ -421,8 +421,8 @@ def main(args):
             if not args.distributed and next(iter(sd.items()))[0].startswith("module"):
                 sd = {k[len("module.") :]: v for k, v in sd.items()}
             model.load_state_dict(sd)
-            if optimizer is not None:
-                optimizer.load_state_dict(checkpoint["optimizer"])
+            # if optimizer is not None:
+            #     optimizer.load_state_dict(checkpoint["optimizer"])
             if scaler is not None and "scaler" in checkpoint:
                 scaler.load_state_dict(checkpoint["scaler"])
             logging.info(

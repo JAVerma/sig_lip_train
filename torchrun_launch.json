@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "configurations": [
+      {
+        "name": "Python Debugger: sig",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "torchrun",
+        "console": "integratedTerminal",
+        "cwd": "/home/jayant/Desktop/jivi/sig_lip_train/open_clip",
+        "justMyCode": false,
+        "args": [
+            "--nproc_per_node", "1",
+            "-m", "training.main",
+            "--save-frequency", "1",
+            "--save-most-recent",
+            "--zeroshot-frequency", "1",
+            "--train-data", "jiviai/RSNA_Refined",
+            "--dataset-type", "hf",
+            "--beta1", "0.9",
+            "--beta2", "0.95",
+            "--warmup", "166",
+            "--wd", "0.2",
+            "--batch-size", "64",
+            "--epochs", "10",
+            "--workers", "1",
+            "--model", "ViT-SO400M-14-SigLIP-384",
+            "--precision", "amp_bf16",
+            "--local-loss",
+            "--gather-with-grad",
+            "--force-image-size", "384",
+            "--grad-checkpointing",
+            "--log-every-n-steps", "32",
+            "--seed", "0",
+            "--logsdir", "./logs/",
+            "--name", "siglip_test_only_image_bglr",
+            "--report-to", "wandb",
+            "--wandb-project-name", "siglip-finetune-pneumonia",
+            "--vision_encoder", "10",
+            "--siglip" ,"true",
+            "--lr", "2.048e-3"
+          ]
+      }
+    ]}
+  
