@@ -5,7 +5,7 @@
         "name": "Python Debugger: sig",
         "type": "debugpy",
         "request": "launch",
-        "module": "torchrun",
+        "module": "torch.distributed.run",
         "console": "integratedTerminal",
         "cwd": "/home/jayant/Desktop/jivi/sig_lip_train/open_clip",
         "justMyCode": false,
@@ -37,7 +37,7 @@
             "--report-to", "wandb",
             "--wandb-project-name", "siglip-finetune-pneumonia",
             "--vision_encoder", "10",
-            "--siglip" ,"true",
+            "--siglip",
             "--lr", "2.048e-3"
           ]
       }
