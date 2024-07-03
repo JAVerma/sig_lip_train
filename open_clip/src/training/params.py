@@ -128,6 +128,12 @@ def parse_args(args):
         "--batch-size", type=int, default=64, help="Batch size per GPU."
     )
     parser.add_argument(
+        "--vision_encoder", type=int, default=4, help="layers to open."
+    )
+    parser.add_argument(
+        "--text_encoder", type=int, default=4, help="layers to open."
+    )
+    parser.add_argument(
         "--epochs", type=int, default=32, help="Number of epochs to train for."
     )
     parser.add_argument(

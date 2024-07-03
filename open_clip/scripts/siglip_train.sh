@@ -3,14 +3,14 @@ TORCH_CUDNN_V8_API_ENABLED=1 torchrun --nproc_per_node 1 -m training.main \
     --save-frequency 1 \
     --save-most-recent \
     --zeroshot-frequency 1 \
-    --train-data 'jiviai/xray_caption_conv' \
+    --train-data 'jiviai/RSNA_Refined' \
     --dataset-type "hf" \
     --lr "2.048e-4" \
     --beta1 0.9 \
     --beta2 0.95 \
     --warmup 166 \
     --wd 0.2 \
-    --batch-size 64 \
+    --batch-size 256 \
     --aug-cfg scale='(0.4, 1.0)' color_jitter='(0.32, 0.32, 0.32, 0.08)' color_jitter_prob=0.5 gray_scale_prob=0.5 \
     --epochs=10 \
     --workers=1 \
@@ -23,9 +23,9 @@ TORCH_CUDNN_V8_API_ENABLED=1 torchrun --nproc_per_node 1 -m training.main \
     --log-every-n-steps 32 \
     --seed 0 \
     --logsdir ./logs/ \
-    --name 'DFN-ImageFailLatest2' \
+    --name 'siglip_test' \
     --report-to "wandb" \
     --wandb-project-name "siglip-finetune-chest" \
-    --vision_encoder 4 \
-    --text_encoder 4
+    --vision_encoder 7 \
+    --text_encoder 5
     # --val-data 'jiviai/xray_caption_conv' \
