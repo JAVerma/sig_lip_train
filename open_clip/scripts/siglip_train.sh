@@ -27,5 +27,6 @@ TORCH_CUDNN_V8_API_ENABLED=1 torchrun --nproc_per_node 1 -m training.main \
     --report-to "wandb" \
     --wandb-project-name "siglip-finetune-chest" \
     --vision_encoder 7 \
-    --text_encoder 5
+    --text_encoder 5 \
+    --siglip
     # --val-data 'jiviai/xray_caption_conv' \
