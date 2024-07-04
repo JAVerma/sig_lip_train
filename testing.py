@@ -31,3 +31,6 @@
 # print("All images processed and saved successfully.")
 import torch
 check=torch.load('/home/jayant/Desktop/jivi/sig_lip_train/open_clip/logs/siglip_test_only_image_2/checkpoints/epoch_5.pt')
+for k ,v in check.items():
+    if k=='optimizer':
+        print(v)

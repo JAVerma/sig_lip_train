@@ -57,36 +57,58 @@ losses = AverageMeter()
 
 # list_image_path = glob.glob('/')
 # list_txt = ''
-hf_dataset = "jiviai/xray_caption_conv"
-hf_dataset = "jiviai/xray_test"
+hf_dataset = "jiviai/RSNA_Refined"
+# hf_dataset = "jiviai/xray_test"
 # dataset = multiclassdataset(hf_dataset, processor, tokenizer)
+
+
+model.train()
+
+for layer in model.parameters():
+        layer.requires_grad = False
+if args.vision_encoder >0:
+    layers=int(args.vision_encoder)*-1
+    if args.vision_encoder:
+        for layer in model.vision_model.encoder.layers[layers:]:
+            layer.requires_grad_(True)
+        model.vision_model.post_layernorm.requires_grad_(True)
+        model.vision_model.head.requires_grad_(True)
+        
+if args.text_encoder:
+    layers=int(args.text_encoder)*-1
+    for layer in model.text_model.encoder.layers[layers:]:
+        layer.requires_grad_(True)
+    model.text_model.final_layer_norm.requires_grad_(True)
+    model.text_model.head.requires_grad_(True)
+
+# for name,p in model.named_parameters():
+#     if p.requires_grad:
+#         print(name)
+# print('check')
 dataset = multiclassdataset(hf_dataset, auto_processor)
 train_dataloader = DataLoader(
     dataset, batch_size=args.batch_size, shuffle=True, drop_last=True
 )  # Define your own dataloader
-
 optimizer = AdamW(model.parameters(), lr=args.lr)
 scheduler = lr_scheduler.CosineAnnealingLR(
     optimizer=optimizer, T_max=len(dataset) / args.batch_size * args.epochs
 )
-
-model.train()
-
 for epoch in range(args.epochs):  # loop over the dataset multiple times
     for idx, batch in enumerate(tqdm(train_dataloader)):
         # # get the inputs;
-        # pixel_values, labels = batch
         # zero the parameter gradients
         optimizer.zero_grad()
-        batch["pixel_values"] = batch["pixel_values"][0]
-        batch.to(device)
+        batch["pixel_values"] = batch["pixel_values"]
+        batch['return_loss']=True
+        inputs = batch
+        # batch.to(device)
         # forward pass
         outputs = model(
-            **batch
-        )
+            **inputs
+            )
         # calculate gradients
         loss = outputs.loss
-        # losses.update(loss.item(), pixel_values.size(0))
+        losses.update(loss.item(), batch["pixel_values"].size(0))
         loss.backward()
 
         # optimization step
