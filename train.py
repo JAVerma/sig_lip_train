@@ -93,7 +93,7 @@ optimizer = AdamW(model.parameters(), lr=args.lr)
 scheduler = lr_scheduler.CosineAnnealingLR(
     optimizer=optimizer, T_max=len(dataset) / args.batch_size * args.epochs
 )
-for epoch in range(args.epochs):  # loop over the dataset multiple times
+for epoch in tqdm(range(args.epochs),total=args.epochs):  # loop over the dataset multiple times
     for idx, batch in enumerate(tqdm(train_dataloader)):
         # # get the inputs;
         # zero the parameter gradients
@@ -114,7 +114,7 @@ for epoch in range(args.epochs):  # loop over the dataset multiple times
         # optimization step
         optimizer.step()
         scheduler.step()
-        print(f"running loss : {losses}")
+        # print(f"running loss : {losses.avg}")
         if idx % 100 == 0:
             print(
                 "Epoch: [{0}][{1}/{2}]\t"
