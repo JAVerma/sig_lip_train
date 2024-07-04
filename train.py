@@ -114,7 +114,7 @@ for epoch in range(args.epochs):  # loop over the dataset multiple times
         # optimization step
         optimizer.step()
         scheduler.step()
-
+        print(f"running loss : {losses}")
         if idx % 100 == 0:
             print(
                 "Epoch: [{0}][{1}/{2}]\t"
