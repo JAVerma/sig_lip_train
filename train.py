@@ -13,7 +13,7 @@ from argument import parse_args
 from dataloader import multiclassdataset
 from freeze_layers import freeze_layer
 import wandb
-wandb.init(entity="jayant", project="sig-lip-train")
+wandb.init( project="sig_train")
 # BATCH_SIZE=8
 # save_path='/home/jayant/Desktop/jivi/siglip/trained_model'
 # unfreeze_layer=4
