@@ -12,7 +12,8 @@ from transformers import (AutoImageProcessor, AutoModel, AutoProcessor,
 from argument import parse_args
 from dataloader import multiclassdataset
 from freeze_layers import freeze_layer
-
+import wandb
+wandb.init(entity="jayant", project="sig-lip-train")
 # BATCH_SIZE=8
 # save_path='/home/jayant/Desktop/jivi/siglip/trained_model'
 # unfreeze_layer=4
@@ -20,6 +21,14 @@ from freeze_layers import freeze_layer
 
 
 args = parse_args()
+wandb.config = {"epochs": args.epochs,
+                "batch_size":args.batch_size,
+                "unfreezed_vision_encoder_layer":args.vision_encoder,
+                "unfreezed_vision_encoder_layer":args.text_encoder,
+                "learning_rate": args.lr
+                }
+
+
 
 model = AutoModel.from_pretrained("google/siglip-so400m-patch14-384")
 processor = AutoImageProcessor.from_pretrained("google/siglip-so400m-patch14-384")
@@ -109,6 +118,9 @@ for epoch in tqdm(range(args.epochs),total=args.epochs):  # loop over the datase
         # calculate gradients
         loss = outputs.loss
         losses.update(loss.item(), batch["pixel_values"].size(0))
+        wandb.log({"loss": loss.item()})
+
+
         loss.backward()
 
         # optimization step
@@ -124,6 +136,6 @@ for epoch in tqdm(range(args.epochs),total=args.epochs):  # loop over the datase
             )
 
     save_model = os.path.join(
-        args.save_path, f"s{epoch}_loss_{loss.avg:.4f}_loss_val_{loss.val:.4f}.pth"
+        args.save_path, f"epoch_{epoch}.pth"
     )
     torch.save(model.state_dict(), save_model)
