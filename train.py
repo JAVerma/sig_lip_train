@@ -118,7 +118,7 @@ for epoch in tqdm(range(args.epochs),total=args.epochs):  # loop over the datase
         # calculate gradients
         loss = outputs.loss
         losses.update(loss.item(), batch["pixel_values"].size(0))
-        wandb.log({"loss": loss.item()})
+        wandb.log({"loss": loss.item(),"epoch":epoch})
 
 
         loss.backward()
