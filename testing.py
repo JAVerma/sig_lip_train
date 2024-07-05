@@ -40,13 +40,15 @@ for i in tqdm(range(1),total=1):
         model.load_state_dict(model_dict)
     model.to('cuda')
     folder_path = "/home/ubuntu/sig_lip_train/rsna_test"
-    prompts = {
+    prompts_old = {
         folder.strip().replace("no_pneumonia", "photo of chest x-ray with healthy lungs"):folder for folder in os.listdir(folder_path)
     }
-    for k , v in prompts.items():
+    prompts={}
+    for k , v in prompts_old.items():
         if v=='pneumonia':
-            del prompts[k]
             prompts['photo of chest x-ray with pnuemonia']=v
+        else:
+            prompts[k]=v
     print(prompts)
     # break
     def process_folder_open_clip(folder_path):
