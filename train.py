@@ -13,7 +13,7 @@ from argument import parse_args
 from dataloader import multiclassdataset
 from freeze_layers import freeze_layer
 import wandb
-wandb.init( project="sig_train")
+# wandb.init( project="sig_train")
 # BATCH_SIZE=8
 # save_path='/home/jayant/Desktop/jivi/siglip/trained_model'
 # unfreeze_layer=4
@@ -21,12 +21,12 @@ wandb.init( project="sig_train")
 
 
 args = parse_args()
-wandb.config = {"epochs": args.epochs,
-                "batch_size":args.batch_size,
-                "unfreezed_vision_encoder_layer":args.vision_encoder,
-                "unfreezed_vision_encoder_layer":args.text_encoder,
-                "learning_rate": args.lr
-                }
+# wandb.config = {"epochs": args.epochs,
+#                 "batch_size":args.batch_size,
+#                 "unfreezed_vision_encoder_layer":args.vision_encoder,
+#                 "unfreezed_vision_encoder_layer":args.text_encoder,
+#                 "learning_rate": args.lr
+#                 }
 
 
 
@@ -75,7 +75,7 @@ model.train()
 
 for layer in model.parameters():
         layer.requires_grad = False
-if args.vision_encoder >0:
+if args.vision_encoder >0 and args.vision_encoder>1:
     layers=int(args.vision_encoder)*-1
     if args.vision_encoder:
         for layer in model.vision_model.encoder.layers[layers:]:
@@ -83,7 +83,7 @@ if args.vision_encoder >0:
         model.vision_model.post_layernorm.requires_grad_(True)
         model.vision_model.head.requires_grad_(True)
         
-if args.text_encoder:
+if args.text_encoder and args.text_encoder>1:
     layers=int(args.text_encoder)*-1
     for layer in model.text_model.encoder.layers[layers:]:
         layer.requires_grad_(True)
@@ -118,7 +118,7 @@ for epoch in tqdm(range(args.epochs),total=args.epochs):  # loop over the datase
         # calculate gradients
         loss = outputs.loss
         losses.update(loss.item(), batch["pixel_values"].size(0))
-        wandb.log({"loss": loss.item(),"epoch":epoch})
+        # wandb.log({"loss": loss.item(),"epoch":epoch})
 
 
         loss.backward()
@@ -134,7 +134,7 @@ for epoch in tqdm(range(args.epochs),total=args.epochs):  # loop over the datase
                     epoch, idx, len(train_dataloader), loss=losses
                 )
             )
-
+    os.makedirs(args.save_path,exist_ok=True)
     save_model = os.path.join(
         args.save_path, f"epoch_{epoch}.pth"
     )

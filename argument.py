@@ -8,6 +8,6 @@ def parse_args():
     parser.add_argument("--lr", type=float, default=2e-4)
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--vision_encoder", type=int, default=10)
-    parser.add_argument("--text_encoder", type=int, default=7)
+    parser.add_argument("--text_encoder", type=int, default=0)
     # args=parser.parse_args(args)
     return parser.parse_args()
