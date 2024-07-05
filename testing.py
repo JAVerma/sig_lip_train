@@ -43,7 +43,7 @@ for i in tqdm(range(1),total=1):
     prompts = {
         folder.strip().replace("no_pneumonia", "photo of chest x-ray with healthy lungs"):folder for folder in os.listdir(folder_path)
     }
-    for k , v in prompts:
+    for k , v in prompts.items():
         if v=='pneumonia':
             del prompts[k]
             prompts['photo of chest x-ray with pnuemonia']=v
