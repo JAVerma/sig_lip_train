@@ -1,2 +1,62 @@
-__pycache__
-.vscode
+# Python cache and temporary files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.manifest
+*.spec
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints/
+
+# WandB logs and artifacts
+wandb/
+*.wandb
+wandb-debug.log
+
+# Virtual environment folders
+.env/
+.venv/
+env/
+venv/
+ENV/
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+*.swp
+*.lock
+*.pid
+
+# Compiled notebooks or generated code
+*.ipynb_convert/
+
+# PyTorch checkpoints and model weights
+*.pth
+*.pt
+checkpoints/
+weights/
+
+# Data directories
+data/
+datasets/
+
+# Outputs and artifacts
+outputs/
+artifacts/

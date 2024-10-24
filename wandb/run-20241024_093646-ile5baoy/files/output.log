@@ -1,3 +1,3 @@
 Epoch 1/100:   0%|                                                                                                                         | 0/750 [00:00<?, ?it/s]/home/jayant/miniconda3/envs/pytorch/lib/python3.10/site-packages/torch/nn/parallel/parallel_apply.py:79: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
   with torch.cuda.device(device), torch.cuda.stream(stream), autocast(enabled=autocast_enabled):
-Epoch 1/100:   2%|██▋                                                                                                             | 18/750 [00:51<34:09,  2.80s/it]
+Epoch 1/100:   7%|████████                                                                                                        | 54/750 [02:35<33:22,  2.88s/it]
