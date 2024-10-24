@@ -1,5 +1,0 @@
-Epoch 1/100:   1%|▊                                                                                                            | 11/1500 [00:31<1:11:52,  2.90s/it]
-Traceback (most recent call last):
-  File "/home/jayant/sig_lip_train/train_with_head.py", line 275, in <module>
-    losses.update(loss.item(), images.size(0))
-KeyboardInterrupt
