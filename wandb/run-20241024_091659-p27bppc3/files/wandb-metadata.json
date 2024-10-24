@@ -1,0 +1,49 @@
+{
+  "os":  "Linux-6.8.0-1016-gcp-x86_64-with-glibc2.35",
+  "python":  "3.10.0",
+  "startedAt":  "2024-10-24T09:16:59.272410Z",
+  "program":  "/home/jayant/sig_lip_train/train_with_head.py",
+  "codePath":  "train_with_head.py",
+  "git":  {
+    "remote":  "https://github.com/JAVerma/sig_lip_train.git",
+    "commit":  "fcd5d13325fea0317945cb6f61620fe13a7776a5"
+  },
+  "email":  "jayant@neurodiscovery.ai",
+  "root":  "/home/jayant/sig_lip_train",
+  "host":  "nd-platform-dev-gpu-002-2l4",
+  "username":  "jayant",
+  "executable":  "/home/jayant/miniconda3/envs/pytorch/bin/python",
+  "codePathLocal":  "train_with_head.py",
+  "cpu_count":  12,
+  "cpu_count_logical":  24,
+  "gpu":  "NVIDIA L4",
+  "gpu_count":  2,
+  "disk":  {
+    "/":  {
+      "total":  "520120602624",
+      "used":  "491674210304"
+    }
+  },
+  "memory":  {
+    "total":  "101241831424"
+  },
+  "cpu":  {
+    "count":  12,
+    "countLogical":  24
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA L4",
+      "memoryTotal":  "24152899584",
+      "cudaCores":  7424,
+      "architecture":  "Ada"
+    },
+    {
+      "name":  "NVIDIA L4",
+      "memoryTotal":  "24152899584",
+      "cudaCores":  7424,
+      "architecture":  "Ada"
+    }
+  ],
+  "cudaVersion":  "12.4"
+}

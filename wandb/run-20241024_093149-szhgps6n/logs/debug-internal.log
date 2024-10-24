@@ -1,0 +1,12 @@
+{"time":"2024-10-24T09:31:49.072955364Z","level":"INFO","msg":"using version","core version":"0.18.5"}
+{"time":"2024-10-24T09:31:49.072969492Z","level":"INFO","msg":"created symlink","path":"/home/jayant/sig_lip_train/wandb/run-20241024_093149-szhgps6n/logs/debug-core.log"}
+{"time":"2024-10-24T09:31:49.174948637Z","level":"INFO","msg":"created new stream","id":"szhgps6n"}
+{"time":"2024-10-24T09:31:49.17498171Z","level":"INFO","msg":"stream: started","id":"szhgps6n"}
+{"time":"2024-10-24T09:31:49.175065335Z","level":"INFO","msg":"sender: started","stream_id":"szhgps6n"}
+{"time":"2024-10-24T09:31:49.175012408Z","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"szhgps6n"}}
+{"time":"2024-10-24T09:31:49.175121952Z","level":"INFO","msg":"handler: started","stream_id":{"value":"szhgps6n"}}
+{"time":"2024-10-24T09:31:49.319566548Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-10-24T09:32:32.88391476Z","level":"INFO","msg":"stream: closing","id":"szhgps6n"}
+{"time":"2024-10-24T09:32:32.883940797Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-10-24T09:32:32.8846553Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-10-24T09:32:33.276648424Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}

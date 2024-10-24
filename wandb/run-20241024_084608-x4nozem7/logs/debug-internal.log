@@ -1,0 +1,16 @@
+{"time":"2024-10-24T08:46:08.41871317Z","level":"INFO","msg":"using version","core version":"0.18.5"}
+{"time":"2024-10-24T08:46:08.418727097Z","level":"INFO","msg":"created symlink","path":"/home/jayant/sig_lip_train/wandb/run-20241024_084608-x4nozem7/logs/debug-core.log"}
+{"time":"2024-10-24T08:46:08.521535038Z","level":"INFO","msg":"created new stream","id":"x4nozem7"}
+{"time":"2024-10-24T08:46:08.521570355Z","level":"INFO","msg":"stream: started","id":"x4nozem7"}
+{"time":"2024-10-24T08:46:08.521689312Z","level":"INFO","msg":"sender: started","stream_id":"x4nozem7"}
+{"time":"2024-10-24T08:46:08.52162892Z","level":"INFO","msg":"handler: started","stream_id":{"value":"x4nozem7"}}
+{"time":"2024-10-24T08:46:08.521607121Z","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"x4nozem7"}}
+{"time":"2024-10-24T08:46:08.745352126Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-10-24T08:50:32.352622273Z","level":"INFO","msg":"stream: closing","id":"x4nozem7"}
+{"time":"2024-10-24T08:50:32.3526625Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-10-24T08:50:32.353281327Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-10-24T08:50:34.01778398Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2024-10-24T08:50:34.12182906Z","level":"INFO","msg":"handler: closed","stream_id":{"value":"x4nozem7"}}
+{"time":"2024-10-24T08:50:34.121870127Z","level":"INFO","msg":"sender: closed","stream_id":"x4nozem7"}
+{"time":"2024-10-24T08:50:34.121853995Z","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"x4nozem7"}}
+{"time":"2024-10-24T08:50:34.121920081Z","level":"INFO","msg":"stream: closed","id":"x4nozem7"}

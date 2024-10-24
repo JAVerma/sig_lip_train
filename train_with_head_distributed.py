@@ -33,7 +33,7 @@ CONFIG = dict(
     pct_start=0.2,
     anneal_strategy='linear',
     weight_decay=0.0002,
-    batch_size=16,
+    batch_size=32,
     dropout=0.5,
     hid_dim=512,
     activation='relu'
@@ -148,6 +148,10 @@ class Classifier(nn.Module):
         clip_model, _ = clip.load(CONFIG["clip_type"], device)
         self.clip_model = clip_model.visual
 
+        # Ensure model layers are FP32
+        self.clip_model = self.clip_model.float()
+
+        # Remove or modify layers like ln_post if needed
         if hasattr(self.clip_model, 'ln_post'):
             self.clip_model.ln_post = nn.Identity()
 
@@ -155,7 +159,7 @@ class Classifier(nn.Module):
             blocks = list(self.clip_model.transformer.resblocks.children())
             self.clip_model.transformer.resblocks = nn.Sequential(*blocks[:-1])
 
-        freeze_layer(self.clip_model, 2)
+        freeze_layer(self.clip_model, 4)
 
         # Define classifier head
         self.cls_head = nn.Sequential(
@@ -169,11 +173,7 @@ class Classifier(nn.Module):
             get_activation[CONFIG["activation"]](),
             nn.Dropout(CONFIG["dropout"]),
             nn.Linear(CONFIG['hid_dim'] // 4, num_classes)
-        ).to(device).train()
-
-        # Convert entire model to FP32
-        self.clip_model.float()
-        self.cls_head.float()
+        ).float()  # Ensure the classifier head is in FP32
 
     def forward(self, x):
         # Ensure input is in FP32
@@ -183,76 +183,17 @@ class Classifier(nn.Module):
         return self.cls_head(x)
 
 
-
 # Initialize data and model
 trainloader, testloader = load_split_train_test(DATA_DIR)
-model = Classifier(num_classes).to(device)
+
+# Wrap model in DataParallel for multi-GPU support
+model = Classifier(num_classes)
+model = nn.DataParallel(model)  # Use DataParallel to distribute across GPUs
+model = model.to(device)
+
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=CONFIG["max_lr"], weight_decay=CONFIG["weight_decay"])
-scaler = torch.GradScaler(device=device)
 
-scheduler = optim.lr_scheduler.OneCycleLR(optimizer, max_lr=CONFIG["max_lr"],
-                                          steps_per_epoch=len(trainloader), epochs=CONFIG["epochs"],
-                                          pct_start=CONFIG["pct_start"], anneal_strategy=CONFIG["anneal_strategy"])
-
-global_accuracy = 0
-
-# Training loop
-# Training loop
-# for epoch in range(1, CONFIG["epochs"] + 1):
-#     model.train()
-#     losses = AverageMeter()
-
-#     with tqdm(total=len(trainloader), desc=f"Epoch {epoch}/{CONFIG['epochs']}") as pbar:
-#         for images, labels in trainloader:
-#             images, labels = images.to(device), labels.to(device)
-
-#             with torch.autocast(device_type=device, dtype=torch.float16):  # Ensure correct autocast
-#                 preds = model(images)
-#                 loss = criterion(preds, labels)
-
-#             # Unscale the gradients before backward() to avoid FP16 issues
-#             scaler.scale(loss).backward()
-#             scaler.unscale_(optimizer)  # Unscale gradients
-
-#             # Check for NaN/Inf in gradients and skip step if found
-#             if not any(torch.isnan(p.grad).any() or torch.isinf(p.grad).any() for p in model.parameters() if p.grad is not None):
-#                 scaler.step(optimizer)  # Step the optimizer only if gradients are valid
-#                 scaler.update()  # Update the scaler
-
-#             optimizer.zero_grad(set_to_none=True)  # Clear gradients
-
-#             losses.update(loss.item(), images.size(0))
-#             pbar.update(1)
-
-#     # Validation loop
-#     model.eval()
-#     correct, total = 0, 0
-#     test_losses = AverageMeter()
-
-#     with torch.no_grad():
-#         for images, labels in testloader:
-#             images, labels = images.to(device), labels.to(device)
-
-#             with torch.autocast(device_type=device, dtype=torch.float16):
-#                 preds = model(images)
-#                 loss = criterion(preds, labels)
-
-#                 correct += (preds.argmax(1) == labels).sum().item()
-#                 total += labels.size(0)
-
-#                 test_losses.update(loss.item(), images.size(0))
-
-#     accuracy = correct / total
-#     wandb.log({"train_loss": losses.avg, "test_loss": test_losses.avg, "accuracy": accuracy})
-
-#     if accuracy > global_accuracy:
-#         global_accuracy = accuracy
-#         save_dir = f'weights/{wandb.run.name}-{wandb.run.id}'
-#         os.makedirs(save_dir, exist_ok=True)
-#         torch.save(model.state_dict(), os.path.join(save_dir, 'best.pth'))
-
-#     torch.save(model.state_dict(), os.path.join(save_dir, 'latest.pth'))
 # Training loop
 for epoch in range(1, CONFIG["epochs"] + 1):
     model.train()
@@ -262,16 +203,13 @@ for epoch in range(1, CONFIG["epochs"] + 1):
         for images, labels in trainloader:
             images, labels = images.to(device), labels.to(device)
 
-            # Forward pass through the model
             preds = model(images)
             loss = criterion(preds, labels)
 
-            # Backpropagation and optimization
             loss.backward()
             optimizer.step()
-            optimizer.zero_grad(set_to_none=True)  # Clear gradients
+            optimizer.zero_grad(set_to_none=True)
 
-            # Update the loss tracker
             losses.update(loss.item(), images.size(0))
             pbar.update(1)
 
@@ -284,27 +222,21 @@ for epoch in range(1, CONFIG["epochs"] + 1):
         for images, labels in testloader:
             images, labels = images.to(device), labels.to(device)
 
-            # Forward pass through the model
             preds = model(images)
             loss = criterion(preds, labels)
 
-            # Compute accuracy
             correct += (preds.argmax(1) == labels).sum().item()
             total += labels.size(0)
 
-            # Update test loss tracker
             test_losses.update(loss.item(), images.size(0))
 
-    # Calculate accuracy
     accuracy = correct / total
     wandb.log({"train_loss": losses.avg, "test_loss": test_losses.avg, "accuracy": accuracy})
 
-    # Save the best model if accuracy improves
     if accuracy > global_accuracy:
         global_accuracy = accuracy
         save_dir = f'weights/{wandb.run.name}-{wandb.run.id}'
         os.makedirs(save_dir, exist_ok=True)
         torch.save(model.state_dict(), os.path.join(save_dir, 'best.pth'))
 
-    # Save the latest model
     torch.save(model.state_dict(), os.path.join(save_dir, 'latest.pth'))
