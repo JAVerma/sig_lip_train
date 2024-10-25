@@ -114,8 +114,8 @@ class ImageDataset(Dataset):
         return img, label
 
 # Train/test split
-def load_split_train_test(datadir, valid_size=0.2):
-    dataset = ImageDataset(datadir, augment=True)
+def load_split_train_test(datadir, valid_size=0.2,augment=True):
+    dataset = ImageDataset(datadir, augment=augment)
 
     indices = list(range(len(dataset)))
     np.random.shuffle(indices)
@@ -135,4 +135,124 @@ def load_split_train_test(datadir, valid_size=0.2):
 
 # Freeze layers
 def freeze_layer(module, unfreezed_layer=4):
-    for param in module.parame
+    for param in module.parameters():
+        param.requires_grad = False
+    for layer in list(module.children())[-unfreezed_layer:]:
+        for param in layer.parameters():
+            param.requires_grad = True
+
+# Classifier model with CLIP
+class Classifier(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        clip_model, _ = clip.load(CONFIG["clip_type"], device)
+        self.clip_model = clip_model.visual
+
+        # Ensure model layers are FP32
+        self.clip_model = self.clip_model.float()
+
+        # Remove or modify layers like ln_post if needed
+        if hasattr(self.clip_model, 'ln_post'):
+            self.clip_model.ln_post = nn.Identity()
+
+        if hasattr(self.clip_model, 'transformer'):
+            blocks = list(self.clip_model.transformer.resblocks.children())
+            self.clip_model.transformer.resblocks = nn.Sequential(*blocks[:-1])
+
+        freeze_layer(self.clip_model, 4)
+
+        # Define classifier head
+        self.cls_head = nn.Sequential(
+            nn.Linear(768, CONFIG['hid_dim']),
+            get_activation[CONFIG["activation"]](),
+            nn.Dropout(CONFIG["dropout"]),
+            nn.Linear(CONFIG['hid_dim'], CONFIG['hid_dim'] // 2),
+            get_activation[CONFIG["activation"]](),
+            nn.Dropout(CONFIG["dropout"]),
+            nn.Linear(CONFIG['hid_dim'] // 2, CONFIG['hid_dim'] // 4),
+            get_activation[CONFIG["activation"]](),
+            nn.Dropout(CONFIG["dropout"]),
+            nn.Linear(CONFIG['hid_dim'] // 4, num_classes)
+        ).float()  # Ensure the classifier head is in FP32
+
+    def forward(self, x):
+        # Ensure input is in FP32
+        x = x.float()
+        x = self.clip_model(x)
+        x = x.view(x.size(0), -1)
+        return self.cls_head(x)
+
+
+# Initialize data and model
+trainloader, testloader = load_split_train_test(DATA_DIR)
+
+# Wrap model in DataParallel for multi-GPU support
+model = Classifier(num_classes)
+model = nn.DataParallel(model)  # Use DataParallel to distribute across GPUs
+model = model.to(device)
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=CONFIG["max_lr"], weight_decay=CONFIG["weight_decay"])
+global_accuracy = 0.0
+# Training loop
+# Training loop
+for epoch in range(1, CONFIG["epochs"] + 1):
+    model.train()
+    losses = AverageMeter()
+
+    with tqdm(total=len(trainloader), desc=f"Epoch {epoch}/{CONFIG['epochs']}") as pbar:
+        for images, labels in trainloader:
+            images, labels = images.to(device), labels.to(device)
+
+            # Forward pass through the model
+            preds = model(images)
+            loss = criterion(preds, labels)
+
+            # Backpropagation and optimization
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad(set_to_none=True)  # Clear gradients
+
+            # Update the loss tracker
+            losses.update(loss.item(), images.size(0))
+            pbar.update(1)
+
+    # Validation loop
+    model.eval()
+    correct, total = 0, 0
+    test_losses = AverageMeter()
+
+    with torch.no_grad():
+        for images, labels in testloader:
+            images, labels = images.to(device), labels.to(device)
+
+            # Forward pass through the model
+            preds = model(images)
+            loss = criterion(preds, labels)
+
+            # Compute accuracy
+            correct += (preds.argmax(1) == labels).sum().item()
+            total += labels.size(0)
+
+            # Update test loss tracker
+            test_losses.update(loss.item(), images.size(0))
+
+    # Calculate accuracy
+    accuracy = correct / total
+    wandb.log({"epoch": epoch, "train_loss": losses.avg, "test_loss": test_losses.avg, "accuracy": accuracy})
+
+    # Save the weights with epoch number
+    save_dir = f'weights/{wandb.run.name}-{wandb.run.id}'
+    os.makedirs(save_dir, exist_ok=True)
+
+    # Save weights for the current epoch
+    epoch_weight_path = os.path.join(save_dir, f'epoch_{epoch:03d}.pth')
+    torch.save(model.state_dict(), epoch_weight_path)
+
+    # Save the latest model
+    torch.save(model.state_dict(), os.path.join(save_dir, 'latest.pth'))
+
+    # Save the best model if accuracy improves
+    if accuracy > global_accuracy:
+        global_accuracy = accuracy
+        torch.save(model.state_dict(), os.path.join(save_dir, 'best.pth'))

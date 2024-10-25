@@ -43,7 +43,7 @@ Thumbs.db
 *.swp
 *.lock
 *.pid
-
+*.png
 # Compiled notebooks or generated code
 *.ipynb_convert/
 
