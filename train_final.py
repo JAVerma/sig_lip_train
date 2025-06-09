@@ -247,4 +247,4 @@ for epoch in range(1, CONFIG["epochs"] + 1):
     # Save the best model if accuracy improves
     if accuracy > global_accuracy:
         global_accuracy = accuracy
-        torch.save(model.state_dict(), os.path.join(save_dir, 'best.pth')
+        torch.save(model.state_dict(), os.path.join(save_dir, 'best.pth'))
